@@ -43,7 +43,7 @@
       "Author": "Cardboard (calico-crusade)",
       "Url": "https://github.com/calico-crusade/umc-cheatmenu",
       "GameVersion": "1.0",
-      "Type": 0,
+      "Type": 1,
       "ContactMethod": "Discord: Cardboard#0026",
       "InstallSettings": {
         "Owner": "calico-crusade",
