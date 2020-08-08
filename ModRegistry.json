@@ -1,0 +1,24 @@
+{
+  "Mods": [
+    {
+      "Guid": "calico-crusade.umc-backtravel",
+      "Name": "Back Travel",
+      "Description": "Allows fast travel to previous zones via the Cartographer (as opposed to only traveling to later zones)",
+      "Author": "Cardboard (calico-crusade)",
+      "Url": "https://github.com/calico-crusade/umc-backtravel",
+      "GameVersion": "1.0",
+      "Type": 17,
+      "ContactMethod": "Discord: Cardboard#0026",
+      "InstallSettings": {
+        "Owner": "calico-crusade",
+        "Repo": "umc-backtravel",
+        "Version": null,
+        "Files": [
+          "UnderMineControl.BackTravel.zip"
+        ]
+      }
+    }
+  ],
+  "FileVersion": "1.0.0.0",
+  "UpdateUrl": ""
+}
