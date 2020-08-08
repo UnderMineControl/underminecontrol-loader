@@ -17,6 +17,42 @@
           "UnderMineControl.BackTravel.zip"
         ]
       }
+    },
+    {
+      "Guid": "calico-crusade.umc-example",
+      "Name": "Example Mod",
+      "Description": "Adds some features you can use to test if UMC is working correctly",
+      "Author": "Cardboard (calico-crusade)",
+      "Url": "https://github.com/calico-crusade/umc-example",
+      "GameVersion": "1.0",
+      "Type": 0,
+      "ContactMethod": "Discord: Cardboard#0026",
+      "InstallSettings": {
+        "Owner": "calico-crusade",
+        "Repo": "umc-example",
+        "Version": null,
+        "Files": [
+          "UnderMineControl.Example.zip"
+        ]
+      }
+    },
+    {
+      "Guid": "calico-crusade.umc-cheatmenu",
+      "Name": "Cheat Menu",
+      "Description": "Adds some cheaty keybinds into UnderMine",
+      "Author": "Cardboard (calico-crusade)",
+      "Url": "https://github.com/calico-crusade/umc-cheatmenu",
+      "GameVersion": "1.0",
+      "Type": 0,
+      "ContactMethod": "Discord: Cardboard#0026",
+      "InstallSettings": {
+        "Owner": "calico-crusade",
+        "Repo": "umc-cheatmenu",
+        "Version": null,
+        "Files": [
+          "UnderMineControl.CheatMenu.zip"
+        ]
+      }
     }
   ],
   "FileVersion": "1.0.0.0",
