@@ -38,6 +38,8 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.lblSearch = new System.Windows.Forms.Label();
             this.txtSearch = new System.Windows.Forms.TextBox();
+            this.cbFilterInstall = new System.Windows.Forms.ComboBox();
+            this.cbTypeFilter = new System.Windows.Forms.ComboBox();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMods)).BeginInit();
             this.SuspendLayout();
@@ -136,15 +138,39 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearch.Location = new System.Drawing.Point(96, 29);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(908, 23);
+            this.txtSearch.Size = new System.Drawing.Size(654, 23);
             this.txtSearch.TabIndex = 6;
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
+            // 
+            // cbFilterInstall
+            // 
+            this.cbFilterInstall.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbFilterInstall.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbFilterInstall.FormattingEnabled = true;
+            this.cbFilterInstall.Location = new System.Drawing.Point(756, 29);
+            this.cbFilterInstall.Name = "cbFilterInstall";
+            this.cbFilterInstall.Size = new System.Drawing.Size(121, 23);
+            this.cbFilterInstall.TabIndex = 7;
+            this.cbFilterInstall.SelectedIndexChanged += new System.EventHandler(this.cbFilterInstall_SelectedIndexChanged);
+            // 
+            // cbTypeFilter
+            // 
+            this.cbTypeFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbTypeFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbTypeFilter.FormattingEnabled = true;
+            this.cbTypeFilter.Location = new System.Drawing.Point(883, 29);
+            this.cbTypeFilter.Name = "cbTypeFilter";
+            this.cbTypeFilter.Size = new System.Drawing.Size(121, 23);
+            this.cbTypeFilter.TabIndex = 7;
+            this.cbTypeFilter.SelectedIndexChanged += new System.EventHandler(this.cbTypeFilter_SelectedIndexChanged);
             // 
             // frmMods
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1016, 492);
+            this.Controls.Add(this.cbTypeFilter);
+            this.Controls.Add(this.cbFilterInstall);
             this.Controls.Add(this.txtSearch);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.btnCancel);
@@ -175,6 +201,8 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label lblSearch;
         private System.Windows.Forms.TextBox txtSearch;
+        private System.Windows.Forms.ComboBox cbFilterInstall;
+        private System.Windows.Forms.ComboBox cbTypeFilter;
     }
 }
 

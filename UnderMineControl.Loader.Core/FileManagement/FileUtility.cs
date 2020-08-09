@@ -263,11 +263,15 @@ namespace UnderMineControl.Loader.Core.FileManagement
         {
             try
             {
+                loadedCache = new Cache();
+                SaveCache();
+
                 var dir = CacheDirectory;
                 if (!Directory.Exists(dir))
                     return true;
 
-                Directory.Delete(dir);
+                Directory.Delete(dir, true);
+                EnsureDirectories();
                 return true;
             }
             catch (Exception ex)

@@ -140,15 +140,7 @@ Cardboard (calico-crusade)");
         {
             _uninstall.Uninstall(_config.VortexUninstall);
 
-            var umcFiles = await GetFiles(_config.Dependencies.UnderMineControl);
-            if (umcFiles == null || umcFiles.Length <= 0 ||
-                umcFiles.Any(t => !t.Worked))
-            {
-                _logger.LogWarning("Could not find any UMC files");
-                return false;
-            }
-
-            var bep = (await GetFiles(_config.Dependencies.BepInEx)).FirstOrDefault();
+            var bep = (await GetFiles(_config.Dependencies.UnderMineControl)).FirstOrDefault();
             if (bep == null || !bep.Worked)
             {
                 _logger.LogWarning("Could not find the BepInEx file!");
@@ -174,17 +166,6 @@ Cardboard (calico-crusade)");
             var bepPluginsDir = Path.Combine(gameDirectory, _config.UmcInstallDirectory);
             if (!Directory.Exists(bepPluginsDir))
                 Directory.CreateDirectory(bepPluginsDir);
-
-            _logger.LogDebug($"Extracting UnderMineControl files to {bepPluginsDir}");
-
-            foreach (var file in umcFiles)
-            {
-                var fileName = Path.Combine(bepPluginsDir, file.FileName);
-                File.Copy(file.Path, fileName, true);
-                _logger.LogDebug($"Copied {file.Path} to {fileName}");
-            }
-
-            _logger.LogDebug($"UMC files copied.");
 
             var modsDir = Path.Combine(gameDirectory, "Mods");
             if (!Directory.Exists(modsDir))

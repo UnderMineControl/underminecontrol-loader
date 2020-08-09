@@ -37,6 +37,8 @@ namespace UnderMineControl.Loader.UI
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            BuildComboBoxes();
+
             menuMain.Build()
                     .AddSubMenu("Install", _ =>
                     {
@@ -74,6 +76,40 @@ namespace UnderMineControl.Loader.UI
 
             SetLoading(true, "Fetching latest mods...", 100);
             HandleModRegistry();
+        }
+
+        private void BuildComboBoxes()
+        {
+            var filter = new DataTable();
+            filter.Columns.Add("Display", typeof(string));
+            filter.Columns.Add("Value", typeof(string));
+
+            filter.Rows.Add("All", "");
+            filter.Rows.Add("Installed", " AND Installed = TRUE");
+            filter.Rows.Add("Uninstalled", " AND Installed = FALSE");
+
+            cbFilterInstall.DataSource = filter;
+            cbFilterInstall.DisplayMember = "Display";
+            cbFilterInstall.ValueMember = "Value";
+
+            var types = new DataTable();
+            types.Columns.Add("Display", typeof(string));
+            types.Columns.Add("Value", typeof(string));
+
+            types.Rows.Add("All", "");
+            var strTypes = ModTypeString((ModType)(-1))
+                                .Split(',')
+                                .Select(t => t.Trim())
+                                .ToArray();
+
+            foreach (var type in strTypes)
+                types.Rows.Add(type, " AND Type LIKE '%" + type + "%'");
+
+            types.Rows.Add("Blank", " AND Type = ''");
+
+            cbTypeFilter.DataSource = types;
+            cbTypeFilter.DisplayMember = "Display";
+            cbTypeFilter.ValueMember = "Value";
         }
 
         private void SetLoading(bool loading, string text = "Loading...", int progress = 100)
@@ -215,6 +251,8 @@ namespace UnderMineControl.Loader.UI
             var worked = await _core.InstallUmc();
             SetLoading(false);
 
+            HandleModRegistry();
+
             if (!worked)
                 MessageBox.Show("Something went wrong when installing UMC. Please check the logs!");
             else
@@ -290,8 +328,15 @@ namespace UnderMineControl.Loader.UI
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
+            if (_mods == null)
+                return;
+
             var search = txtSearch.Text.Replace("'", "");
-            _mods.DefaultView.RowFilter = $"Name LIKE '%{search}%' OR Description LIKE '%{search}%' OR Author LIKE '%{search}%'";
+
+            string installFilter = (string)cbFilterInstall.SelectedValue;
+            string typeFilter = (string)cbTypeFilter.SelectedValue;
+
+            _mods.DefaultView.RowFilter = $"(Name LIKE '%{search}%' OR Description LIKE '%{search}%' OR Author LIKE '%{search}%'){installFilter}{typeFilter}";
             dgvMods.Refresh();
         }
 
@@ -309,6 +354,8 @@ namespace UnderMineControl.Loader.UI
                 this.InvokeAction(() => SetLoading(false));
 
                 this.InvokeAction(() => HandleModRegistry());
+
+                this.InvokeAction(() => txtSearch_TextChanged(null, null));
             }).Start();
         }
 
@@ -316,6 +363,16 @@ namespace UnderMineControl.Loader.UI
         {
             SetLoading(true, "Reseting mods list...", 100);
             HandleModRegistry();
+        }
+
+        private void cbFilterInstall_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            txtSearch_TextChanged(null, null);
+        }
+
+        private void cbTypeFilter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            txtSearch_TextChanged(null, null);
         }
     }
 }

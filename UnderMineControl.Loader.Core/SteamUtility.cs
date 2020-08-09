@@ -158,8 +158,6 @@ namespace UnderMineControl.Loader.Core
 
         public string FindGameDirectory(string gameName)
         {
-            return @"C:\Users\Cardboard\Desktop\UnderMineTest"; //Temporary testing
-
             try
             {
                 var basePath = GetBaseInstallPath();

@@ -2,7 +2,6 @@
 {
     public class SettingDependencies
     {
-        public Dependency BepInEx { get; set; }
         public Dependency UnderMineControl { get; set; }
     }
 }
