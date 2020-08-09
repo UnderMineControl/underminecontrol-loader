@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace UnderMineControl.Loader.Core.FileManagement
 {
-    using Models;
+    using System.Linq;
 
     public interface IFileUtility
     {
@@ -128,11 +128,15 @@ namespace UnderMineControl.Loader.Core.FileManagement
         {
             try
             {
-                var result = GetCachedFile(url, maxAgeDays);
-                if (result != null && result.Worked)
+                FileResult result;
+                if (maxAgeDays > 0)
                 {
-                    _logger.LogDebug("Using cached file for: " + url);
-                    return result;
+                    result = GetCachedFile(url, maxAgeDays);
+                    if (result != null && result.Worked)
+                    {
+                        _logger.LogDebug("Using cached file for: " + url);
+                        return result;
+                    }
                 }
 
                 _logger.LogDebug("Starting download of " + url);
@@ -143,8 +147,7 @@ namespace UnderMineControl.Loader.Core.FileManagement
                 using (var client = new WebClient())
                 using (var io = client.OpenRead(url))
                 {
-                    var dispoition = client.ResponseHeaders[FILE_DOWNLOAD_DISPOSITION];
-                    var filename = new ContentDisposition(dispoition).FileName;
+                    var filename = ResolveFileName(client, url);
 
                     using (var sw = File.OpenWrite(cachePath))
                     {
@@ -165,8 +168,12 @@ namespace UnderMineControl.Loader.Core.FileManagement
                         Path = cachePath
                     };
 
-                    loadedCache.Files.Add(result.Cached);
-                    SaveCache();
+                    if (maxAgeDays > 0)
+                    {
+                        loadedCache.Files.Add(result.Cached);
+                        SaveCache();
+                    }
+
                     return result;
                 }
             }
@@ -199,6 +206,15 @@ namespace UnderMineControl.Loader.Core.FileManagement
             }
         }
 
+        public string ResolveFileName(WebClient client, string url)
+        {
+            var dispoition = client.ResponseHeaders[FILE_DOWNLOAD_DISPOSITION];
+            if (!string.IsNullOrEmpty(dispoition))
+                return new ContentDisposition(dispoition).FileName;
+
+            return url.Split('/').Last().Split('?').First();
+        }
+
         public string ValidateCache(FileCache cache, int maxAgeDays)
         {
             if (cache == null)
@@ -218,13 +234,17 @@ namespace UnderMineControl.Loader.Core.FileManagement
             if (cache.Files.Count <= 0)
                 return null;
 
-            foreach(var file in cache.Files)
+            foreach(var file in cache.Files.ToArray())
             {
                 if (file.WebLocation == url)
                 {
                     var filePath = ValidateCache(file, maxAgeDays);
                     if (filePath == null)
+                    {
+                        loadedCache.Files.Remove(file);
+                        SaveCache();
                         return null;
+                    }
 
                     return new FileResult
                     {

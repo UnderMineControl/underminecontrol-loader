@@ -10,6 +10,7 @@ namespace UnderMineControl.Loader.Setup
     {
         ISetupUtility AddTransient<T1, T2>() where T2 : class, T1 where T1 : class;
         ISetupUtility AddSingleton<T1>(T1 item) where T1 : class;
+        ISetupUtility AddSingleton<T1>() where T1 : class;
         T Build<T>();
         ISetupUtility AddLogging();
         ISetupUtility Configure(Action<IServiceCollection> action);
@@ -37,6 +38,12 @@ namespace UnderMineControl.Loader.Setup
         public ISetupUtility AddSingleton<T1>(T1 item) where T1 : class
         {
             _collection.AddSingleton(typeof(T1), item);
+            return this;
+        }
+
+        public ISetupUtility AddSingleton<T1>() where T1: class
+        {
+            _collection.AddSingleton(typeof(T1));
             return this;
         }
 

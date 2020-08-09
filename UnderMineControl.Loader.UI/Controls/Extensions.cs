@@ -35,6 +35,7 @@ namespace UnderMineControl.Loader.UI.Controls
 
             public StripBuilder Add(ToolStripItem item, Action<ToolStripItem> config = null)
             {
+                item.AutoSize = true;
                 config?.Invoke(item);
                 Collection.Add(item);
                 return this;
@@ -47,8 +48,12 @@ namespace UnderMineControl.Loader.UI.Controls
 
             public StripBuilder AddButton(string text, Action<object, EventArgs, ToolStripButton> onClick, string toolTip = null, Action<ToolStripButton> config = null)
             {
-                var item = new ToolStripButton(text);
-                item.ToolTipText = toolTip;
+                var item = new ToolStripButton(text)
+                {
+                    ToolTipText = toolTip,
+                    AutoSize = true,
+                    CheckOnClick = false
+                };
                 item.Click += (e, s) => onClick(e, s, item);
                 return Add(item, config);
             }
@@ -70,17 +75,26 @@ namespace UnderMineControl.Loader.UI.Controls
 
             public StripBuilder AddSeperator(Action<ToolStripSeparator> config = null)
             {
-                return Add(new ToolStripSeparator(), config);
+                return Add(new ToolStripSeparator()
+                {
+                    AutoSize = true
+                }, config);
             }
 
             public StripBuilder AddTextBox(Action<ToolStripTextBox> config = null)
             {
-                return Add(new ToolStripTextBox(), config);
+                return Add(new ToolStripTextBox()
+                {
+                    AutoSize = true
+                }, config);
             }
 
             public StripBuilder AddSubMenu(string text, Action<StripBuilder> config)
             {
-                var item = new ToolStripMenuItem(text);
+                var item = new ToolStripMenuItem(text)
+                {
+                    AutoSize = true
+                };
                 Collection.Add(item);
 
                 var strip = new StripBuilder(item);

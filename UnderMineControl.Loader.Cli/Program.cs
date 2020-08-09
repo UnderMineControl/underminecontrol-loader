@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
 namespace UnderMineControl.Loader.Cli
 {
     using Core;
-    using Core.Models;
+    using Core.FileManagement;
     using Setup;
-    using UnderMineControl.Loader.Core.FileManagement;
 
     public interface IProgram
     {
@@ -21,21 +21,39 @@ namespace UnderMineControl.Loader.Cli
 
         private readonly ILogger _logger;
         private readonly ICoreUtility _core;
+        private readonly IModRegistryUtility _registry;
 
-        public Program(ILogger<Program> logger, ICoreUtility core)
+        public Program(ILogger<Program> logger, ICoreUtility core, IModRegistryUtility registry)
         {
             _logger = logger;
             _core = core;
+            _registry = registry;
         }
 
         public async Task Start()
         {
-            var install = true;
+            //await Install();
+            GetMods();
+            //Uninstall();
+            //await Registry();
+        }
 
-            if (install)
-                await Install();
-            else
-                Uninstall();
+        public void GetMods()
+        {
+            var mods = _core.GetInstalledMods();
+            foreach(var owner in mods)
+            {
+                foreach(var repo in owner.Value)
+                {
+                    _logger.LogDebug($"Found mod: {owner.Key}/{repo}");
+                }
+            }
+        }
+
+        private async Task Registry()
+        {
+            var reg = await _registry.GetRegistry();
+            Console.WriteLine(JsonConvert.SerializeObject(reg, Formatting.Indented));
         }
 
         private void Uninstall()
@@ -76,6 +94,9 @@ namespace UnderMineControl.Loader.Cli
                             .AddTransient<ISteamUtility, SteamUtility>()
                             .AddTransient<IRepoUtility, RepoUtility>()
                             .AddTransient<IFileUtility, FileUtility>()
+                            .AddTransient<IModRegistryUtility, ModRegistryUtility>()
+                            .AddTransient<IInstallUtility, InstallUtility>()
+                            .AddTransient<IUninstallUtility, UninstallUtility>()
 
                             //Register the main program entry point
                             .AddTransient<IProgram, Program>()
