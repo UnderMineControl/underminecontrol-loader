@@ -5,12 +5,12 @@
       "Name": "Back Travel",
       "Description": "Allows fast travel to previous zones via the Cartographer (as opposed to only traveling to later zones)",
       "Author": "Cardboard (calico-crusade)",
-      "Url": "https://github.com/calico-crusade/umc-backtravel",
+      "Url": "https://github.com/UnderMineControl/umc-backtravel",
       "GameVersion": "1.0",
       "Type": 17,
       "ContactMethod": "Discord: Cardboard#0026",
       "InstallSettings": {
-        "Owner": "calico-crusade",
+        "Owner": "UnderMineControl",
         "Repo": "umc-backtravel",
         "Version": null,
         "Files": [
@@ -23,12 +23,12 @@
       "Name": "Example Mod",
       "Description": "Adds some features you can use to test if UMC is working correctly",
       "Author": "Cardboard (calico-crusade)",
-      "Url": "https://github.com/calico-crusade/umc-example",
+      "Url": "https://github.com/UnderMineControl/umc-example",
       "GameVersion": "1.0",
       "Type": 0,
       "ContactMethod": "Discord: Cardboard#0026",
       "InstallSettings": {
-        "Owner": "calico-crusade",
+        "Owner": "UnderMineControl",
         "Repo": "umc-example",
         "Version": null,
         "Files": [
@@ -41,12 +41,12 @@
       "Name": "Cheat Menu",
       "Description": "Adds some cheaty keybinds into UnderMine",
       "Author": "Cardboard (calico-crusade)",
-      "Url": "https://github.com/calico-crusade/umc-cheatmenu",
+      "Url": "https://github.com/UnderMineControl/umc-cheatmenu",
       "GameVersion": "1.0",
       "Type": 1,
       "ContactMethod": "Discord: Cardboard#0026",
       "InstallSettings": {
-        "Owner": "calico-crusade",
+        "Owner": "UnderMineControl",
         "Repo": "umc-cheatmenu",
         "Version": null,
         "Files": [
@@ -56,5 +56,5 @@
     }
   ],
   "FileVersion": "1.0.0.0",
-  "UpdateUrl": "https://raw.githubusercontent.com/calico-crusade/underminecontrol-loader/master/ModRegistry.json"
+  "UpdateUrl": "https://raw.githubusercontent.com/UnderMineControl/underminecontrol-loader/master/ModRegistry.json"
 }
