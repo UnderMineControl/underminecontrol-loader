@@ -66,7 +66,7 @@
       "InstallSettings": {
         "Owner": "3ocene",
         "Repo": "WonderMine",
-        "Version": null,
+        "Version": "*",
         "Files": [
           "WonderMine.dll",
           "WonderMine.umc"
