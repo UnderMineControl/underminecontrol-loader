@@ -53,6 +53,25 @@
           "UnderMineControl.CheatMenu.zip"
         ]
       }
+    },
+    {
+      "Guid": "3ocene.wondermine",
+      "Name": "Wondermine Twitch Extension",
+      "Description": "Adds an interactive list of items to your twitch stream! Read more about it on https://github.com/3ocene/WonderMine",
+      "Author": "3Ocene",
+      "Url": "https://github.com/3ocene/WonderMine",
+      "GameVersion": "1.0",
+      "Type": 1,
+      "ContactMethod": "Discord: 3ocene#4631",
+      "InstallSettings": {
+        "Owner": "3ocene",
+        "Repo": "WonderMine",
+        "Version": null,
+        "Files": [
+          "WonderMine.dll",
+          "WonderMine.umc"
+        ]
+      }
     }
   ],
   "FileVersion": "1.0.0.0",
