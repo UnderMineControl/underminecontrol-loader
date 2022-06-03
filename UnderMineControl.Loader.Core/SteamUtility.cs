@@ -8,181 +8,206 @@ using System.Linq;
 
 namespace UnderMineControl.Loader.Core
 {
-    public interface ISteamUtility
-    {
-        string FindGameDirectory(string gameName);
-        bool Verify(int appId);
-    }
+	public interface ISteamUtility
+	{
+		string FindGameDirectory(string gameName);
+		bool Verify(int appId);
+	}
 
-    public class SteamUtility : ISteamUtility
-    {
-        private const string STEAM_REGKEY_32 = @"SOFTWARE\Valve\Steam";
-        private const string STEAM_REGKEY_64 = @"SOFTWARE\Wow6432Node\Valve\Steam";
-        private const string STEAM_REGKEY_INSTALL = "InstallPath";
-        private const string STEAM_DEFAULT_INSTALL = @"C:\Program Files\Steam";
-        private const string STEAM_GAME_FOLDER = @"steamapps\common\";
-        private const string STEAM_LIBRARYFOLDERS_FILE = @"steamapps\libraryfolders.vdf";
-        private const string STEAM_VERIFY = "steam://validate/";
+	public class SteamUtility : ISteamUtility
+	{
+		private const string STEAM_REGKEY_32 = @"SOFTWARE\Valve\Steam";
+		private const string STEAM_REGKEY_64 = @"SOFTWARE\Wow6432Node\Valve\Steam";
+		private const string STEAM_REGKEY_INSTALL = "InstallPath";
+		private const string STEAM_DEFAULT_INSTALL = @"C:\Program Files\Steam";
+		private const string STEAM_GAME_FOLDER = @"steamapps\common\";
+		private const string STEAM_LIBRARYFOLDERS_FILE = @"steamapps\libraryfolders.vdf";
+		private const string STEAM_VERIFY = "steam://validate/";
 
-        private readonly ILogger _logger;
+		private readonly ILogger _logger;
 
-        public SteamUtility(ILogger<SteamUtility> logger)
-        {
-            _logger = logger ?? throw new NullReferenceException("logger");
-        }
+		public SteamUtility(ILogger<SteamUtility> logger)
+		{
+			_logger = logger ?? throw new NullReferenceException("logger");
+		}
 
-        public RegistryKey GetSteamRegistryKey(out bool isX64)
-        {
-            isX64 = false;
-            try
-            {
-                _logger.LogDebug("Checking for steam registry keys");
+		public RegistryKey GetSteamRegistryKey(out bool isX64)
+		{
+			isX64 = false;
 
-                var x64 = Registry.LocalMachine.OpenSubKey(STEAM_REGKEY_64);
-                if (x64 != null &&
-                    !string.IsNullOrEmpty(x64.ToString()))
-                {
-                    _logger.LogDebug("Found 64 bit steam reg key");
-                    isX64 = true;
-                    return x64;
-                }
+			try
+			{
+				_logger.LogDebug("Checking for steam registry keys");
 
-                var x32 = Registry.LocalMachine.OpenSubKey(STEAM_REGKEY_32);
-                if (x32 != null &&
-                    !string.IsNullOrEmpty(x32.ToString()))
-                {
-                    _logger.LogDebug("Found 32 bit steam reg key");
-                    return x32;
-                }
+				var x64 = Registry.LocalMachine.OpenSubKey(STEAM_REGKEY_64);
 
-                _logger.LogWarning("Couldn't find a steam registry key!");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error trying to find steam registry keys");
-                return null;
-            }
-        }
+				if (x64 != null &&
+				    !string.IsNullOrEmpty(x64.ToString()))
+				{
+					_logger.LogDebug("Found 64 bit steam reg key");
+					isX64 = true;
+					return x64;
+				}
 
-        public string GetBaseInstallPath()
-        {
-            try
-            {
-                _logger.LogDebug("Starting to find Steam Base Install Path");
+				var x32 = Registry.LocalMachine.OpenSubKey(STEAM_REGKEY_32);
 
-                var key = GetSteamRegistryKey(out _);
+				if (x32 != null &&
+				    !string.IsNullOrEmpty(x32.ToString()))
+				{
+					_logger.LogDebug("Found 32 bit steam reg key");
+					return x32;
+				}
 
-                if (key != null)
-                {
-                    var regpath = key.GetValue(STEAM_REGKEY_INSTALL)?.ToString();
-                    _logger.LogInformation($"Found steam install path: {regpath}");
-                    if (!string.IsNullOrEmpty(regpath) && Directory.Exists(regpath))
-                        return regpath;
+				_logger.LogWarning("Couldn't find a steam registry key!");
+				return null;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error trying to find steam registry keys");
+				return null;
+			}
+		}
 
-                    _logger.LogWarning($"Steam install path couldn't be verified: {regpath}");
-                }
+		public string GetBaseInstallPath()
+		{
+			try
+			{
+				_logger.LogDebug("Starting to find Steam Base Install Path");
 
-                _logger.LogDebug("Attempting to resolve default steam install path as registry key failed!");
-                if (Directory.Exists(STEAM_DEFAULT_INSTALL))
-                    return STEAM_DEFAULT_INSTALL;
+				var key = GetSteamRegistryKey(out _);
 
-                _logger.LogWarning("Couldn't find any steam installs, is steam even installed?");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting Steam Install Path");
-                return null;
-            }
-        }
+				if (key != null)
+				{
+					var regpath = key.GetValue(STEAM_REGKEY_INSTALL)?.ToString();
+					_logger.LogInformation($"Found steam install path: {regpath}");
 
-        public IEnumerable<KeyValuePair<string, string>> ParseVdf(string data)
-        {
-            var lines = data.Split('\n');
-            foreach(var line in lines)
-            {
-                if (!line.StartsWith("\t"))
-                    continue;
+					if (!string.IsNullOrEmpty(regpath) && Directory.Exists(regpath))
+						return regpath;
 
-                var parts = line.Trim('\t').Split(new[] { "\t\t" }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length == 2)
-                    yield return new KeyValuePair<string, string>(parts[0].Trim('\"'), parts[1].Trim('\"'));
-            }
-        }
+					_logger.LogWarning($"Steam install path couldn't be verified: {regpath}");
+				}
 
-        public IEnumerable<string> GetGameDirectories(string baseInstallPath)
-        {
-            yield return baseInstallPath;
+				_logger.LogDebug("Attempting to resolve default steam install path as registry key failed!");
 
-            var path = Path.Combine(baseInstallPath, STEAM_LIBRARYFOLDERS_FILE);
-            if (!File.Exists(path))
-            {
-                _logger.LogWarning($"library folders VDF file doesn't exist: {path}");
-                yield break;
-            }
+				if (Directory.Exists(STEAM_DEFAULT_INSTALL))
+					return STEAM_DEFAULT_INSTALL;
 
-            var data = File.ReadAllText(path);
-            var vdf = ParseVdf(data).ToArray();
+				_logger.LogWarning("Couldn't find any steam installs, is steam even installed?");
+				return null;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error occurred while getting Steam Install Path");
+				return null;
+			}
+		}
 
-            foreach (var entry in vdf)
-            {
-                if (!int.TryParse(entry.Key, out _))
-                    continue;
+		/*
+		public IEnumerable<KeyValuePair<string, string>> ParseVdf(string data)
+		{
+			var lines = data.Split('\n');
 
-                if (Directory.Exists(entry.Value))
-                    yield return entry.Value;
-            }
-        }
+			foreach (var line in lines)
+			{
+				if (!line.StartsWith("\t"))
+					continue;
 
-        public bool Verify(int appId)
-        {
-            try
-            {
-                _logger.LogInformation("Starting steam file verification...");
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = STEAM_VERIFY + appId,
-                    UseShellExecute = true,
-                    CreateNoWindow = false
-                });
-                _logger.LogInformation("Steam file verification finished!");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while verifying game files");
-                return false;
-            }
-        }
+				var parts = line.Trim('\t').Split(new[] { "\t\t" }, StringSplitOptions.RemoveEmptyEntries);
+				Console.WriteLine(line);
 
-        public string FindGameDirectory(string gameName)
-        {
-            try
-            {
-                var basePath = GetBaseInstallPath();
-                if (basePath == null)
-                    return null;
+				if (parts.Length == 2)
+					yield return new KeyValuePair<string, string>(parts[0].Trim('\"'), parts[1].Trim('\"'));
+			}
+		}
+		*/
 
-                var gameDirectories = GetGameDirectories(basePath);
-                foreach(var dir in gameDirectories)
-                {
-                    var path = Path.Combine(dir, STEAM_GAME_FOLDER, gameName);
-                    if (Directory.Exists(path))
-                    {
-                        _logger.LogDebug($"{gameName} directory found: {path}");
-                        return path;
-                    }
-                }
+		public IEnumerable<string> GetGameDirectories(string baseInstallPath)
+		{
+			yield return baseInstallPath;
 
-                _logger.LogWarning("Unable to find directory for game: " + gameName);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while trying to find the game directory.");
-                return null;
-            }
-        }
-    }
+			var path = Path.Combine(baseInstallPath, STEAM_LIBRARYFOLDERS_FILE);
+
+			if (!File.Exists(path))
+			{
+				_logger.LogWarning($"library folders VDF file doesn't exist: {path}");
+				yield break;
+			}
+
+			var data = File.ReadAllText(path);
+			var vdfFile = new VdfFileParser(data);
+			var result = vdfFile.Parse();
+
+			foreach (var vdfFileFolderData in result)
+			{
+				yield return vdfFileFolderData.Value.Path;
+			}
+
+			/*
+			var vdf = ParseVdf(data).ToArray();
+
+			foreach (var entry in vdf)
+			{
+			    if (!int.TryParse(entry.Key, out _))
+			        continue;
+
+			    if (Directory.Exists(entry.Value))
+			        yield return entry.Value;
+			}
+			*/
+		}
+
+		public bool Verify(int appId)
+		{
+			try
+			{
+				_logger.LogInformation("Starting steam file verification...");
+
+				Process.Start(new ProcessStartInfo
+				{
+						FileName = STEAM_VERIFY + appId,
+						UseShellExecute = true,
+						CreateNoWindow = false
+				});
+				_logger.LogInformation("Steam file verification finished!");
+				return true;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error occurred while verifying game files");
+				return false;
+			}
+		}
+
+		public string FindGameDirectory(string gameName)
+		{
+			try
+			{
+				var basePath = GetBaseInstallPath();
+
+				if (basePath == null)
+					return null;
+
+				var gameDirectories = GetGameDirectories(basePath);
+
+				foreach (var dir in gameDirectories)
+				{
+					var path = Path.Combine(dir, STEAM_GAME_FOLDER, gameName);
+
+					if (Directory.Exists(path))
+					{
+						_logger.LogDebug($"{gameName} directory found: {path}");
+						return path;
+					}
+				}
+
+				_logger.LogWarning("Unable to find directory for game: " + gameName);
+				return null;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error occurred while trying to find the game directory.");
+				return null;
+			}
+		}
+	}
 }
